@@ -27,9 +27,8 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
@@ -193,7 +192,7 @@ public abstract class GFileUploadSupport {
 	 * @see GMultipartFile#CommonsMultipartFile(org.apache.commons.fileupload.FileItem)
 	 */
 	protected MultipartParsingResult parseFileItems(List<FileItem> fileItems, String encoding) {
-		MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<String, MultipartFile>();
+		Map<String, MultipartFile> multipartFiles = new HashMap<String, MultipartFile>();
 		Map<String, String[]> multipartParameters = new HashMap<String, String[]>();
 
 		// Extract multipart files and multipart parameters.
@@ -224,11 +223,12 @@ public abstract class GFileUploadSupport {
 			} else {
 				// multipart file field
 				GMultipartFile file = new GMultipartFile(fileItem);
-				multipartFiles.add(file.getName(), file);
+
+				if (multipartFiles.put(file.getName(), file) != null) {
+					throw new MultipartException("Multiple files for field name [" + file.getName() + "] found - not supported by MultipartResolver");
+				}
 				if (logger.isDebugEnabled()) {
-					logger.debug("Found multipart file [" + file.getName() + "] of size " + file.getSize() +
-							" bytes with original filename [" + file.getOriginalFilename() + "], stored " +
-							file.getStorageDescription());
+					logger.debug("Found multipart file [" + file.getName() + "] of size " + file.getSize() + " bytes with original filename [" + file.getOriginalFilename() + "], stored " + file.getStorageDescription());
 				}
 			}
 		}
@@ -260,7 +260,7 @@ public abstract class GFileUploadSupport {
 	 */
 	protected static class MultipartParsingResult {
 
-		private final MultiValueMap<String, MultipartFile> multipartFiles;
+		private final Map<String, MultipartFile> multipartFiles;
 
 		private final Map<String, String[]> multipartParameters;
 
@@ -270,7 +270,7 @@ public abstract class GFileUploadSupport {
 		 * @param mpFiles Map of field name to MultipartFile instance
 		 * @param mpParams Map of field name to form field String value
 		 */
-		public MultipartParsingResult(MultiValueMap<String, MultipartFile> mpFiles, Map<String, String[]> mpParams) {
+		public MultipartParsingResult(Map<String, MultipartFile> mpFiles, Map<String, String[]> mpParams) {
 			this.multipartFiles = mpFiles;
 			this.multipartParameters = mpParams;
 		}
@@ -278,7 +278,7 @@ public abstract class GFileUploadSupport {
 		/**
 		 * Return the multipart files as Map of field name to MultipartFile instance.
 		 */
-		public MultiValueMap<String, MultipartFile> getMultipartFiles() {
+		public Map<String, MultipartFile> getMultipartFiles() {
 			return this.multipartFiles;
 		}
 
