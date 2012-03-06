@@ -195,7 +195,6 @@ public abstract class GFileUploadSupport {
 	protected MultipartParsingResult parseFileItems(List<FileItem> fileItems, String encoding) {
 		MultiValueMap<String, MultipartFile> multipartFiles = new LinkedMultiValueMap<String, MultipartFile>();
 		Map<String, String[]> multipartParameters = new HashMap<String, String[]>();
-		Map<String, String> multipartParameterContentTypes = new HashMap<String, String>();
 
 		// Extract multipart files and multipart parameters.
 		for (FileItem fileItem : fileItems) {
@@ -222,7 +221,6 @@ public abstract class GFileUploadSupport {
 					String[] newParam = StringUtils.addStringToArray(curParam, value);
 					multipartParameters.put(fileItem.getFieldName(), newParam);
 				}
-				multipartParameterContentTypes.put(fileItem.getFieldName(), fileItem.getContentType());
 			} else {
 				// multipart file field
 				GMultipartFile file = new GMultipartFile(fileItem);
@@ -234,7 +232,7 @@ public abstract class GFileUploadSupport {
 				}
 			}
 		}
-		return new MultipartParsingResult(multipartFiles, multipartParameters, multipartParameterContentTypes);
+		return new MultipartParsingResult(multipartFiles, multipartParameters);
 	}
 
 	/**
@@ -266,19 +264,15 @@ public abstract class GFileUploadSupport {
 
 		private final Map<String, String[]> multipartParameters;
 
-		private final Map<String, String> multipartParameterContentTypes;
-
 		/**
 		 * Create a new MultipartParsingResult.
 		 *
 		 * @param mpFiles Map of field name to MultipartFile instance
 		 * @param mpParams Map of field name to form field String value
 		 */
-		public MultipartParsingResult(MultiValueMap<String, MultipartFile> mpFiles, Map<String, String[]> mpParams,
-                                      Map<String, String> mpParamContentTypes) {
+		public MultipartParsingResult(MultiValueMap<String, MultipartFile> mpFiles, Map<String, String[]> mpParams) {
 			this.multipartFiles = mpFiles;
 			this.multipartParameters = mpParams;
-            this.multipartParameterContentTypes = mpParamContentTypes;
 		}
 
 		/**
@@ -293,10 +287,6 @@ public abstract class GFileUploadSupport {
 		 */
 		public Map<String, String[]> getMultipartParameters() {
 			return this.multipartParameters;
-		}
-
-		public Map<String, String> getMultipartParameterContentTypes() {
-			return this.multipartParameterContentTypes;
 		}
 	}
 
