@@ -16,21 +16,16 @@
 
 package org.gmr.web.multipart;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUpload;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * <p>This src is modified from Spring 3.0 CommonsMultipartResolver.java and renamed to GMultipartResolver
@@ -99,7 +94,10 @@ public class GMultipartResolver extends GFileUploadSupport implements MultipartR
 			};
 		} else {
 			MultipartParsingResult parsingResult = parseRequest(request);
-			return new DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(), parsingResult.getMultipartParameters());
+
+			return new DefaultMultipartHttpServletRequest(request, 
+					parsingResult.getMultipartFiles(), 
+					parsingResult.getMultipartParameters(), parsingResult.getMultipartParameterContentTypes());
 		}
 	}
 
@@ -155,5 +153,4 @@ public class GMultipartResolver extends GFileUploadSupport implements MultipartR
 			}
 		}
 	}
-
 }
