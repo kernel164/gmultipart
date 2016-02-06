@@ -144,7 +144,6 @@ public class GFileItem implements FileItem, FileItemHeadersSupport {
 	 *
 	 * @return The content charset passed by the agent or <code>null</code> if not defined.
 	 */
-	@SuppressWarnings("unchecked")
 	public String getCharSet() {
 		ParameterParser parser = new ParameterParser();
 		parser.setLowerCaseNames(true);

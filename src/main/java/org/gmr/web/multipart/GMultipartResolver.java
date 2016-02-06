@@ -108,7 +108,6 @@ public class GMultipartResolver extends GFileUploadSupport implements MultipartR
 	 * @return the parsing result
 	 * @throws MultipartException if multipart resolution failed.
 	 */
-	@SuppressWarnings("unchecked")
 	protected MultipartParsingResult parseRequest(HttpServletRequest request) throws MultipartException {
 		String encoding = determineEncoding(request);
 		FileUpload fileUpload = prepareFileUpload(encoding);
